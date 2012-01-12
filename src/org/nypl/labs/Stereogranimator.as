@@ -931,7 +931,7 @@ package org.nypl.labs {
 			trace("generating...");
 			btnNext.enabled = false;
 			generatingClip.visible = true;
-			ExternalInterface.call("generateFromFlash", sq1x, sq1y, sq2x, sq2y, hsize, vsize, speed, index, mode);
+			ExternalInterface.call("generateFromFlash", sq1x-OFFSET, sq1y, sq2x-OFFSET, sq2y, hsize, vsize, speed, index, mode);
 		}
 
 		public function handleImageLoad(e : Event) : void {
