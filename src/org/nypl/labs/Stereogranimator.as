@@ -273,12 +273,20 @@ package org.nypl.labs {
 			sq1.addEventListener(MouseEvent.MOUSE_MOVE, function(e : MouseEvent) : void {
 				var tg : Square = Square(e.target);
 				if (tg.dragging) {
-					if (tg.stage.mouseX + tg.mx + hsize < vertx) {
-						sq1x = tg.stage.mouseX + tg.mx;
-					} else {
-						sq1x = vertx - hsize - 1;
+					sq1x = tg.stage.mouseX + tg.mx;
+					if (tg.stage.mouseX + tg.mx + hsize > vertx) {
+						sq1x = vertx - hsize;
+					}
+					if (sq1x < 0) {
+						sq1x = 0;
 					}
 					sq1y = tg.stage.mouseY + tg.my;
+					if (sq1y < 0) {
+						sq1y = 0;
+					}
+					if (sq1y + vsize > canvasHeight) {
+						sq1y = canvasHeight - vsize;
+					}
 					// move the other square in a mirror direction
 					var d : Number = vertx - sq1x;
 					sq2x = vertx + d - hsize;
@@ -316,12 +324,20 @@ package org.nypl.labs {
 			sq2.addEventListener(MouseEvent.MOUSE_MOVE, function(e : MouseEvent) : void {
 				var tg : Square = Square(e.target);
 				if (tg.dragging) {
-					if (tg.stage.mouseX + tg.mx > vertx) {
-						sq2x = tg.stage.mouseX + tg.mx;
-					} else {
-						sq2x = vertx + 1;
+					sq2x = stage.mouseX + tg.mx;
+					if (stage.mouseX + tg.mx < vertx) {
+						sq2x = vertx;
 					}
-					sq2y = tg.stage.mouseY + tg.my;
+					if (sq2x + hsize > canvasWidth) {
+						sq2x = canvasWidth - hsize;
+					}
+					sq2y = stage.mouseY + tg.my;
+					if (sq2y < 0) {
+						sq2y = 0;
+					}
+					if (sq2y + vsize > canvasHeight) {
+						sq2y = canvasHeight - vsize;
+					}
 					// move the other square in a mirror direction
 					var d : Number = vertx - sq2x;
 					sq1x = vertx + d - hsize;
@@ -686,10 +702,6 @@ package org.nypl.labs {
 		}
 
 		public function draw() : void {
-			drawStereoscope();
-		}
-
-		public function drawStereoscope() : void {
 			drawBackground();
 			drawVertical();
 			drawSquare(sq1, sq1x, sq1y);
@@ -931,7 +943,7 @@ package org.nypl.labs {
 			trace("generating...");
 			btnNext.enabled = false;
 			generatingClip.visible = true;
-			ExternalInterface.call("generateFromFlash", sq1x-OFFSET, sq1y, sq2x-OFFSET, sq2y, hsize, vsize, speed, index, mode);
+			ExternalInterface.call("generateFromFlash", sq1x - OFFSET, sq1y, sq2x - OFFSET, sq2y, hsize, vsize, speed, index, mode);
 		}
 
 		public function handleImageLoad(e : Event) : void {
