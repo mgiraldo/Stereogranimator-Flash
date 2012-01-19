@@ -1,18 +1,9 @@
 package org.nypl.labs {
 	import flash.external.ExternalInterface;
 	import flash.system.LoaderContext;
-	import flash.system.Security;
-
-	import com.adobe.serialization.json.JSON;
-
-	import flash.events.HTTPStatusEvent;
-	import flash.net.navigateToURL;
-	import flash.net.URLLoader;
-	import flash.net.URLRequestMethod;
 	import flash.display.BitmapDataChannel;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import flash.text.TextField;
 	import flash.net.URLRequest;
 	import flash.display.Loader;
 	import flash.events.IOErrorEvent;
@@ -103,6 +94,7 @@ package org.nypl.labs {
 		public var toggleClip : MovieClip;
 		public var hiddenClip : MovieClip;
 		public var generatingClip : MovieClip;
+		public var txt : MovieClip;
 
 		public function Stereogranimator() {
 			index = stage.loaderInfo.parameters.index == undefined ? "G92F031_020F" : stage.loaderInfo.parameters.index;
@@ -195,6 +187,10 @@ package org.nypl.labs {
 			sq2 = new Square();
 			// to control for mouse position when dragging
 			canvas.addChild(sq2);
+
+			txt.x = -1000;
+			txt.y = 0;
+			txt.mouseEnabled = false;
 
 			ticker.start();
 		}
@@ -707,6 +703,23 @@ package org.nypl.labs {
 			drawSquare(sq1, sq1x, sq1y);
 			drawSquare(sq2, sq2x, sq2y);
 			drawCorners();
+			drawText();
+		}
+
+		public function drawText() : void {
+			if (sq1.over) {
+				// text
+				txt.x = sq1x + (hsize / 2) - (txt.width * .8);
+				txt.y = sq1y + (vsize / 2) + 40; // dragme is not inside canvas which is 40px from top
+			} else if (sq2.over) {
+				// text
+				txt.x = sq2x + (hsize / 2) + (txt.width * .8);
+				txt.y = sq2y + (vsize / 2) + 40;
+			} else {
+				// text
+				txt.x = -1000;
+				txt.y = -1000;
+			}
 		}
 
 		public function drawBackground() : void {
