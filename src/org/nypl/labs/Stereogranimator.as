@@ -95,6 +95,7 @@ package org.nypl.labs {
 		public var hiddenClip : MovieClip;
 		public var generatingClip : MovieClip;
 		public var txt : MovieClip;
+		public var vtxt : MovieClip;
 
 		public function Stereogranimator() {
 			index = stage.loaderInfo.parameters.index == undefined ? "G90F279_079F" : stage.loaderInfo.parameters.index;
@@ -719,6 +720,17 @@ package org.nypl.labs {
 				// text
 				txt.x = -1000;
 				txt.y = -1000;
+			}
+			if (vert_sprite.over) {
+				// text
+				vtxt.x = vertx;
+				vtxt.y = sq1y + vsize + vtxt.height + 40;
+				if (vtxt.y > canvasHeight) {
+					vtxt.y = sq1y + vsize;
+				}
+			} else {
+				// text
+				vtxt.x = -1000;
 			}
 		}
 
