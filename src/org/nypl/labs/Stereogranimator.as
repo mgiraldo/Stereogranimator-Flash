@@ -97,7 +97,7 @@ package org.nypl.labs {
 		public var txt : MovieClip;
 
 		public function Stereogranimator() {
-			index = stage.loaderInfo.parameters.index == undefined ? "G92F031_020F" : stage.loaderInfo.parameters.index;
+			index = stage.loaderInfo.parameters.index == undefined ? "G90F279_079F" : stage.loaderInfo.parameters.index;
 			baseurl = stage.loaderInfo.parameters.host == undefined ? "http://localhost:3000" : stage.loaderInfo.parameters.host;
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -925,9 +925,9 @@ package org.nypl.labs {
 			var right : BitmapData = new BitmapData(hsize, vsize, false, 0x000000);
 			right.copyPixels(bmp.bitmapData, new Rectangle(sq2x - OFFSET, sq2y, hsize, vsize), new Point());
 
-			left.copyChannel(right, new Rectangle(0, 0, right.width, right.height), new Point(0, 0), BitmapDataChannel.RED, BitmapDataChannel.RED);
+			right.copyChannel(left, new Rectangle(0, 0, hsize, vsize), new Point(0, 0), BitmapDataChannel.RED, BitmapDataChannel.RED);
 
-			processbmp.bitmapData = left;
+			processbmp.bitmapData = right;
 			processbmp.x = Math.floor((400 - processbmp.width) * .5);
 			processbmp.y = 10;
 		}
