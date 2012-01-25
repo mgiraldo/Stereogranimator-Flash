@@ -40,7 +40,7 @@ package org.nypl.labs {
 		private var leftimgdata_array : ByteArray;
 		private var rightimgdata_array : ByteArray;
 		// interface elements
-		private static const CORNER_OFFSET : Number = 10;
+		private static const CORNER_OFFSET : Number = 15;
 		private static const canvasWidth : Number = 800;
 		private static const canvasHeight : Number = 540;
 		// background
@@ -81,7 +81,7 @@ package org.nypl.labs {
 		private var MAINFILL : Number = 0x000000;
 		private var BACKFILL : Number = 0x000000;
 		private var update : Boolean = true;
-		private var first : Boolean = true;
+		private var previewActive : Boolean = false;
 		private var mode : String = "GIF";
 		private var index : String = "";
 		private var ticker : Timer;
@@ -96,6 +96,7 @@ package org.nypl.labs {
 		public var generatingClip : MovieClip;
 		public var txt : MovieClip;
 		public var vtxt : MovieClip;
+		public var explainClip : MovieClip;
 
 		public function Stereogranimator() {
 			index = stage.loaderInfo.parameters.index == undefined ? "G90F279_079F" : stage.loaderInfo.parameters.index;
@@ -219,6 +220,10 @@ package org.nypl.labs {
 			// handle movement for VERTICAL handle
 			// wrapper function to provide scope for the event handlers:
 			vert_sprite.addEventListener(MouseEvent.MOUSE_DOWN, function(e : MouseEvent) : void {
+				if (!previewActive) {
+					previewActive = true;
+					update = true;
+				}
 				var tg : Vertical = Vertical(e.target);
 				tg.dragging = true;
 				// drag
@@ -256,6 +261,10 @@ package org.nypl.labs {
 			// handle movement for LEFT square
 			// wrapper function to provide scope for the event handlers:
 			sq1.addEventListener(MouseEvent.MOUSE_DOWN, function(e : MouseEvent) : void {
+				if (!previewActive) {
+					previewActive = true;
+					update = true;
+				}
 				var tg : Square = Square(e.target);
 				// drag
 				tg.dragging = true;
@@ -307,6 +316,10 @@ package org.nypl.labs {
 			// handle movement for RIGHT square
 			// wrapper function to provide scope for the event handlers:
 			sq2.addEventListener(MouseEvent.MOUSE_DOWN, function(e : MouseEvent) : void {
+				if (!previewActive) {
+					previewActive = true;
+					update = true;
+				}
 				var tg : Square = Square(e.target);
 				// drag
 				tg.dragging = true;
@@ -361,6 +374,10 @@ package org.nypl.labs {
 			for (i = 0;i < 8;++i) {
 				tg = corner_sprites[i];
 				tg.addEventListener(MouseEvent.MOUSE_DOWN, function(e : MouseEvent) : void {
+					if (!previewActive) {
+						previewActive = true;
+						update = true;
+					}
 					var t : Corner = Corner(e.target);
 					// drag
 					t.dragging = true;
@@ -711,7 +728,8 @@ package org.nypl.labs {
 			if (sq1.over) {
 				// text
 				txt.x = sq1x + (hsize / 2) - (txt.width * .8);
-				txt.y = sq1y + (vsize / 2) + 40; // dragme is not inside canvas which is 40px from top
+				txt.y = sq1y + (vsize / 2) + 40;
+				// dragme is not inside canvas which is 40px from top
 			} else if (sq2.over) {
 				// text
 				txt.x = sq2x + (hsize / 2) + (txt.width * .8);
@@ -843,16 +861,19 @@ package org.nypl.labs {
 
 		public function tick(e : TimerEvent) : void {
 			// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
+			if (previewActive) {
+				explainClip.visible = false;
+			}
 			if (update) {
 				draw();
 				update = false;
 				// only update once
 				updatePreview();
-				if (mode == "ANAGLYPH") {
+				if (previewActive && mode == "ANAGLYPH") {
 					drawAnaglyph();
 				}
 			}
-			if (mode == "GIF") {
+			if (previewActive && mode == "GIF") {
 				drawGIF();
 			}
 		}
@@ -965,10 +986,12 @@ package org.nypl.labs {
 		}
 
 		public function generate(e : MouseEvent) : void {
-			trace("generating...");
-			btnNext.enabled = false;
-			generatingClip.visible = true;
-			ExternalInterface.call("generateFromFlash", sq1x - OFFSET, sq1y, sq2x - OFFSET, sq2y, hsize, vsize, speed, index, mode);
+			if (previewActive) {
+				trace("generating...");
+				btnNext.enabled = false;
+				generatingClip.visible = true;
+				ExternalInterface.call("generateFromFlash", sq1x - OFFSET, sq1y, sq2x - OFFSET, sq2y, hsize, vsize, speed, index, mode);
+			}
 		}
 
 		public function handleImageLoad(e : Event) : void {
@@ -978,9 +1001,6 @@ package org.nypl.labs {
 			bmp = Bitmap(loader.content);
 			canvas.addChild(bmp);
 
-			if (first) {
-				first = false;
-			}
 			run();
 			prepareInterface();
 			// adding interaction
