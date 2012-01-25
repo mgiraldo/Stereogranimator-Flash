@@ -108,6 +108,7 @@ package org.nypl.labs {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 
 			generatingClip.visible = false;
+			btnNext.visible = false;
 
 			changeSpeed(speed);
 			toggleMode(mode);
@@ -863,6 +864,7 @@ package org.nypl.labs {
 			// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
 			if (previewActive) {
 				explainClip.visible = false;
+				btnNext.visible = true;
 			}
 			if (update) {
 				draw();
