@@ -1,4 +1,6 @@
 package org.nypl.labs {
+	import com.adobe.serialization.json.JSON;
+	import flash.net.URLLoader;
 	import flash.external.ExternalInterface;
 	import flash.system.LoaderContext;
 	import flash.display.BitmapDataChannel;
@@ -97,9 +99,14 @@ package org.nypl.labs {
 		public var txt : MovieClip;
 		public var vtxt : MovieClip;
 		public var explainClip : MovieClip;
+		public var xid : int;
+		private var imgurl : String;
 
 		public function Stereogranimator() {
-			index = stage.loaderInfo.parameters.index == undefined ? "G90F279_079F" : stage.loaderInfo.parameters.index;
+			// flickr 2350715517
+			// nypl G90F279_079F
+			index = stage.loaderInfo.parameters.index == undefined ? "2350715517" : stage.loaderInfo.parameters.index;
+			xid = stage.loaderInfo.parameters.xid == undefined ? 1 : stage.loaderInfo.parameters.xid;
 			baseurl = stage.loaderInfo.parameters.host == undefined ? "http://localhost:3000" : stage.loaderInfo.parameters.host;
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -112,13 +119,39 @@ package org.nypl.labs {
 
 			changeSpeed(speed);
 			toggleMode(mode);
-
-			loadPhoto(index);
-
-			ticker = new Timer(10);
-			ticker.addEventListener("timer", tick);
+			
+			imgurl = "http://images.nypl.org/index.php?id="+index+"&t=w";
+			
+			if (xid!=0) {
+				var url : String = baseurl + "/s/v.json?id=" + index;
+				var ldr : URLLoader = new URLLoader();
+				ldr.addEventListener(Event.COMPLETE, function(e:Event):void {if (URLLoader(e.target).data!="false") loadPhoto(JSON.decode(URLLoader(e.target).data));});
+				ldr.addEventListener(IOErrorEvent.IO_ERROR, handleImageError);
+	
+				var request : URLRequest = new URLRequest(url);
+				ldr.load(request);
+			} else {
+				loadPhoto(imgurl);
+			}
 		}
+/*
+	index = str;
+	//console.log("photo");
+	img.onload = handleImageLoad;
+	img.onerror = handleImageError;
+	imgurl = "http://images.nypl.org/index.php?id="+index+"&t=w";
+	if (xid!=0) {
+		$.ajax({
+			url: "/s/v",
+			dataType: 'json',
+			data: {id:index},
+			success: function(data) {
+				if(data!=false) {
+					imgurl = data;
+					img = new Image();
+					img.src = "/getimagedata.jpeg?r="+imageRotation+"&url="+escape(imgurl);
 
+ */
 		public function prepareInterface() : void {
 			vert_sprite = new Vertical();
 			vert_sprite.x = vertx;
@@ -969,16 +1002,17 @@ package org.nypl.labs {
 
 		public function loadPhoto(str : String) : void {
 			trace("photo");
-			index = str;
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleImageLoad);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, handleImageError);
 
-			var url : String = baseurl + "/getpixels/" + index + ".jpeg";
+			var url : String = baseurl + "/getpixels.jpeg?url=" + escape(str);
 			var request : URLRequest = new URLRequest(url);
 			var lc : LoaderContext = new LoaderContext();
 			lc.checkPolicyFile = false;
 			loader.load(request, lc);
 			hiddenClip.addChild(loader);
+			ticker = new Timer(10);
+			ticker.addEventListener("timer", tick);
 		}
 
 		public function changeSpeed(s : Number) : void {
